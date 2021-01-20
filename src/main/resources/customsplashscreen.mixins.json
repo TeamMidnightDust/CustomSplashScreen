@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "eu.midnightdust.customsplashscreen.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "client": [
+    "SplashScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
