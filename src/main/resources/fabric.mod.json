@@ -7,7 +7,8 @@
   "description": "Change minecraft's loading screen to your liking! Completely configurable!",
   "authors": [
     "Motschen",
-    "TeamMidnightDust"
+    "TeamMidnightDust",
+    "HypherionSA"
   ],
   "contact": {
     "homepage": "https://www.midnightdust.eu/",
@@ -33,7 +34,6 @@
   ],
 
   "depends": {
-    "autoconfig1u": "*",
     "cloth-config2": "*"
   },
   "breaks": {
