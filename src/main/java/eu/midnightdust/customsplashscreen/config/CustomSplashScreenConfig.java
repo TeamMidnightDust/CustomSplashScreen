@@ -1,9 +1,9 @@
 package eu.midnightdust.customsplashscreen.config;
 
-import me.sargunvohra.mcmods.autoconfig1u.ConfigData;
-import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
-import me.sargunvohra.mcmods.autoconfig1u.annotation.ConfigEntry;
-import me.sargunvohra.mcmods.autoconfig1u.shadowed.blue.endless.jankson.Comment;
+import me.shedaniel.autoconfig.ConfigData;
+import me.shedaniel.autoconfig.annotation.Config;
+import me.shedaniel.autoconfig.annotation.ConfigEntry;
+import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 
 @Config(name = "customsplashscreen")
 public class CustomSplashScreenConfig implements ConfigData {
@@ -39,7 +39,6 @@ public class CustomSplashScreenConfig implements ConfigData {
     @Comment(value = "Change the style of the boss loading bar")
     @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
     public BossBarType bossBarType = BossBarType.NOTCHED_6;
-
 
     @ConfigEntry.Gui.CollapsibleObject
     public Textures textures = new Textures();

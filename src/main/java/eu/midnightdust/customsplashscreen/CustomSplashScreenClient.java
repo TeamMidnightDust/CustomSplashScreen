@@ -1,20 +1,13 @@
 package eu.midnightdust.customsplashscreen;
 
 import eu.midnightdust.customsplashscreen.config.CustomSplashScreenConfig;
-import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
-import me.sargunvohra.mcmods.autoconfig1u.serializer.JanksonConfigSerializer;
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.ArmorRenderingRegistry;
-import net.fabricmc.fabric.impl.client.indigo.renderer.helper.TextureHelper;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.texture.TextureManager;
-import net.minecraft.client.texture.TextureUtil;
-import net.minecraft.data.client.model.Texture;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.file.*;
-import java.util.logging.FileHandler;
 
 public class CustomSplashScreenClient implements ClientModInitializer {
 
