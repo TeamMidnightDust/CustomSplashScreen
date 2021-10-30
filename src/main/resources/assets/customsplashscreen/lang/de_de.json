@@ -1,0 +1,19 @@
+{
+	"text.autoconfig.customsplashscreen.title":"Custom Splash Screen Config",
+	"text.autoconfig.customsplashscreen.option.progressBarType":"Typ der Ladestandsanzeige",
+	"text.autoconfig.customsplashscreen.option.logoStyle":"Logo Stil",
+	"text.autoconfig.customsplashscreen.option.backgroundImage":"Hintergrundbild",
+	"text.autoconfig.customsplashscreen.option.backgroundColor":"Hintergrundfarbe",
+	"text.autoconfig.customsplashscreen.option.progressBarColor":"Farbe der Ladestandsanzeige",
+	"text.autoconfig.customsplashscreen.option.progressFrameColor":"Farbe der Umrandung der Ladestandsanzeige",
+	"text.autoconfig.customsplashscreen.option.customProgressBarMode":"Eigener Modus für die Ladestandsanzeige",
+	"text.autoconfig.customsplashscreen.option.customProgressBarBackground":"Eigener Hintergrund der Ladestandsanzeige",
+	"text.autoconfig.customsplashscreen.option.bossBarType":"Stil der Bossleiste",
+	"text.autoconfig.customsplashscreen.option.textures":"Ordner der Texturen",
+	"text.autoconfig.customsplashscreen.option.textures.MojangLogo":"Mojang Logo",
+	"text.autoconfig.customsplashscreen.option.textures.Aspect1to1Logo":"Logo Verhältnis 1:1",
+	"text.autoconfig.customsplashscreen.option.textures.BossBarTexture":"Bossleiste Textur",
+	"text.autoconfig.customsplashscreen.option.textures.CustomBarTexture":"Eigene Textur der Ladestandsanzeige",
+	"text.autoconfig.customsplashscreen.option.textures.CustomBarBackgroundTexture":"Eigene Textur des Hintergrunds der Ladestandsanzeige",
+	"text.autoconfig.customsplashscreen.option.textures.BackgroundTexture":"Hintergrundtextur"
+}
