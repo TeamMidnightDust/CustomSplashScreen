@@ -68,10 +68,10 @@ public class SplashScreenMixin {
         ci.cancel();
     }
 
-    @Inject(at = @At("TAIL"), method = "render", cancellable = false)
+    @Inject(at = @At("TAIL"), method = "render")
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        int i = this.client.getWindow().getScaledWidth();
-        int j = this.client.getWindow().getScaledHeight();
+        int width = this.client.getWindow().getScaledWidth();
+        int height = this.client.getWindow().getScaledHeight();
         long l = Util.getMeasuringTimeMs();
         if (this.reloading && this.reloadStartTime == -1L) {
             this.reloadStartTime = l;
@@ -89,15 +89,15 @@ public class SplashScreenMixin {
             }
 
             m = MathHelper.ceil((1.0F - MathHelper.clamp(f - 1.0F, 0.0F, 1.0F)) * 255.0F);
-            fill(matrices, 0, 0, i, j, withAlpha(m));
+            fill(matrices, 0, 0, width, height, withAlpha(m));
             s = 1.0F - MathHelper.clamp(f - 1.0F, 0.0F, 1.0F);
         } else if (this.reloading) {
             if (this.client.currentScreen != null && g < 1.0F) {
                 this.client.currentScreen.render(matrices, mouseX, mouseY, delta);
             }
 
-            m = MathHelper.ceil(MathHelper.clamp((double)g, 0.15D, 1.0D) * 255.0D);
-            fill(matrices, 0, 0, i, j, withAlpha(m));
+            m = MathHelper.ceil(MathHelper.clamp(g, 0.15D, 1.0D) * 255.0D);
+            fill(matrices, 0, 0, width, height, withAlpha(m));
             s = MathHelper.clamp(g, 0.0F, 1.0F);
         } else {
             m = getBackgroundColor();
@@ -111,7 +111,7 @@ public class SplashScreenMixin {
 
         m = (int)((double)this.client.getWindow().getScaledWidth() * 0.5D);
         int u = (int)((double)this.client.getWindow().getScaledHeight() * 0.5D);
-        double d = Math.min((double)this.client.getWindow().getScaledWidth() * 0.75D, (double)this.client.getWindow().getScaledHeight()) * 0.25D;
+        double d = Math.min((double)this.client.getWindow().getScaledWidth() * 0.75D, this.client.getWindow().getScaledHeight()) * 0.25D;
         int v = (int)(d * 0.5D);
         double e = d * 4.0D;
         int w = (int)(e * 0.5D);
@@ -124,7 +124,7 @@ public class SplashScreenMixin {
             RenderSystem.blendFunc(770, 1);
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, s);
-            drawTexture(matrices, 0, 0, 0, 0, 0, i, j, j, i);
+            drawTexture(matrices, 0, 0, 0, 0, 0, width, height, width, height);
             RenderSystem.defaultBlendFunc();
             RenderSystem.disableBlend();
         }
@@ -152,7 +152,7 @@ public class SplashScreenMixin {
         float y = this.reload.getProgress();
         this.progress = MathHelper.clamp(this.progress * 0.95F + y * 0.050000012F, 0.0F, 1.0F);
         if (f < 1.0F) {
-            this.renderProgressBar(matrices, i / 2 - w, x - 5, i / 2 + w, x + 5, 1.0F - MathHelper.clamp(f, 0.0F, 1.0F), null);
+            this.renderProgressBar(matrices, width / 2 - w, x - 5, width / 2 + w, x + 5, 1.0F - MathHelper.clamp(f, 0.0F, 1.0F), null);
         }
 
         if (f >= 2.0F) {
@@ -187,7 +187,7 @@ public class SplashScreenMixin {
         return getBackgroundColor() | alpha << 24;
     }
 
-    @Inject(at = @At("TAIL"), method = "renderProgressBar", cancellable = false)
+    @Inject(at = @At("TAIL"), method = "renderProgressBar")
     private void renderProgressBar(MatrixStack matrices, int x1, int y1, int x2, int y2, float opacity, CallbackInfo ci) {
         int i = MathHelper.ceil((float)(x2 - x1 - 2) * this.progress);
 
@@ -205,14 +205,14 @@ public class SplashScreenMixin {
 
             int bbWidth = (int) ((x2 - x1+1) * 1.4f);
             int bbHeight = (y2 - y1) * 30;
-            drawTexture(matrices, x1, y1 + 1, 0, 0, 0, x2 - x1, (int) ((y2-y1) / 1.4f), bbHeight, bbWidth);
-            drawTexture(matrices, x1, y1 + 1, 0, 0, 5f, i, (int) ((y2 - y1) / 1.4f), bbHeight, bbWidth);
+            drawTexture(matrices, x1, y1 + 1, 0, 0, 0, x2 - x1, (int) ((y2-y1) / 1.4f), bbWidth, bbHeight);
+            drawTexture(matrices, x1, y1 + 1, 0, 0, 5f, i, (int) ((y2 - y1) / 1.4f), bbWidth, bbHeight);
 
             RenderSystem.enableBlend();
             RenderSystem.blendEquation(32774);
             RenderSystem.blendFunc(770, 1);
             if (overlay != 0) {
-                drawTexture(matrices, x1, y1 + 1, 0, 0, overlay, x2 - x1, (int) ((y2 - y1) / 1.4f), bbHeight, bbWidth);
+                drawTexture(matrices, x1, y1 + 1, 0, 0, overlay, x2 - x1, (int) ((y2 - y1) / 1.4f), bbWidth, bbHeight);
             }
             RenderSystem.defaultBlendFunc();
             RenderSystem.disableBlend();
@@ -228,7 +228,7 @@ public class SplashScreenMixin {
             }
             RenderSystem.setShaderTexture(0, CUSTOM_PROGRESS_BAR_TEXTURE);
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            drawTexture(matrices, x1, y1, 0, 0, 6, i, y2 - y1, 10, customWidth);
+            drawTexture(matrices, x1, y1, 0, 0, 6, i, y2 - y1, customWidth, 10);
         }
 
         // Vanilla / With Color progress bar
