@@ -8,13 +8,13 @@ import eu.midnightdust.customsplashscreen.texture.BlurredConfigTexture;
 import eu.midnightdust.customsplashscreen.texture.ConfigTexture;
 import eu.midnightdust.customsplashscreen.texture.EmptyTexture;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.hud.BackgroundHelper;
 import net.minecraft.client.gui.screen.SplashOverlay;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.resource.ResourceReload;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.ColorHelper.Argb;
 import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -176,7 +176,7 @@ public class SplashScreenMixin {
 
     private static int getBackgroundColor() {
         if (CS_CONFIG.backgroundImage) {
-            return BackgroundHelper.ColorMixer.getArgb(0, 0, 0, 0);
+            return Argb.getArgb(0, 0, 0, 0);
         }
         else {
             return CustomSplashScreenClient.CS_CONFIG.backgroundColor;
