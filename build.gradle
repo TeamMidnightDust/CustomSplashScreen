@@ -1,7 +1,5 @@
-//file:noinspection GroovyAssignabilityCheck
-//file:noinspection GrDeprecatedAPIUsage
 plugins {
-	id 'fabric-loom' version '0.10-SNAPSHOT'
+	id 'fabric-loom' version '0.12-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -12,13 +10,10 @@ archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
-minecraft {
-}
-
 repositories {
-	maven { url "https://jitpack.io" }
-	maven { url "https://maven.shedaniel.me/" }
-	maven { url "https://maven.terraformersmc.com/releases" }
+	maven { url = "https://api.modrinth.com/maven" }
+}
+loom {
 }
 
 dependencies {
@@ -29,11 +24,8 @@ dependencies {
 
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
-		exclude(group: "net.fabricmc.fabric-api")
-	}
-
-	modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
+	modImplementation "maven.modrinth:midnightlib:${project.midnightlib_version}"
+	include "maven.modrinth:midnightlib:${project.midnightlib_version}"
 }
 
 processResources {

@@ -23,9 +23,6 @@
   "entrypoints": {
     "client": [
       "eu.midnightdust.customsplashscreen.CustomSplashScreenClient"
-    ],
-    "modmenu": [
-      "eu.midnightdust.customsplashscreen.config.ModMenuIntegration"
     ]
   },
 
@@ -34,7 +31,7 @@
   ],
 
   "depends": {
-    "cloth-config2": "*"
+    "midnightlib": "*"
   },
   "breaks": {
     "splash": "*",
