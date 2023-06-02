@@ -16,10 +16,10 @@
 	"customsplashscreen.midnightconfig.enum.LogoStyle.Hidden":"Hidden",
 	"customsplashscreen.midnightconfig.logoBlend":"Use Blending on Logo",
 	"customsplashscreen.midnightconfig.backgroundImage":"Background Image",
-	"customsplashscreen.midnightconfig.backgroundColor":"Background Color",
-	"customsplashscreen.midnightconfig.progressBarColor":"Progress Bar Color",
-	"customsplashscreen.midnightconfig.progressFrameColor":"Progress Bar Frame Color",
-	"customsplashscreen.midnightconfig.progressBackgroundColor":"Progress Bar Background Color",
+	"customsplashscreen.midnightconfig.splashBackgroundColor":"Background Color",
+	"customsplashscreen.midnightconfig.splashProgressBarColor":"Progress Bar Color",
+	"customsplashscreen.midnightconfig.splashProgressFrameColor":"Progress Bar Frame Color",
+	"customsplashscreen.midnightconfig.splashProgressBackgroundColor":"Progress Bar Background Color",
 	"customsplashscreen.midnightconfig.customProgressBarMode":"Custom Progress Bar Mode",
 	"customsplashscreen.midnightconfig.enum.ProgressBarMode.Linear":"Linear",
 	"customsplashscreen.midnightconfig.enum.ProgressBarMode.Stretch":"Stretch",
@@ -39,5 +39,6 @@
 	"customsplashscreen.midnightconfig.enum.BossBarType.NOTCHED_6":"6 Notches",
 	"customsplashscreen.midnightconfig.enum.BossBarType.NOTCHED_10":"10 Notches",
 	"customsplashscreen.midnightconfig.enum.BossBarType.NOTCHED_12":"12 Notches",
-	"customsplashscreen.midnightconfig.enum.BossBarType.NOTCHED_20":"20 Notches"
+	"customsplashscreen.midnightconfig.enum.BossBarType.NOTCHED_20":"20 Notches",
+	"customsplashscreen.midnightconfig.bossBarSize":"Boss Bar Size"
 }

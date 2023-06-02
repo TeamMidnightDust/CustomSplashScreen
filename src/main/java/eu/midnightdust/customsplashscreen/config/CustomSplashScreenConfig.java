@@ -25,15 +25,15 @@ public class CustomSplashScreenConfig extends MidnightConfig {
 
     //"Change the color of the background")
     @Entry(category = colors, isColor = true)
-    public static String backgroundColor = "#EF323D";
+    public static String splashBackgroundColor = "#EF323D";
     //"Change the color of the progress bar")
     @Entry(category = colors, isColor = true)
-    public static String progressBarColor = "#FFFFFF";
+    public static String splashProgressBarColor = "#FFFFFF";
     //"Change the color of the progress bar frame")
     @Entry(category = colors, isColor = true)
-    public static String progressFrameColor = "#FFFFFF";
+    public static String splashProgressFrameColor = "#FFFFFF";
     @Entry(category = colors, isColor = true)
-    public static String progressBackgroundColor = "#000000";
+    public static String splashProgressBackgroundColor = "#000000";
 
     //"Enable/Disable the progress bar background")
     @Entry(category = loading)
@@ -49,6 +49,8 @@ public class CustomSplashScreenConfig extends MidnightConfig {
     //"Change the style of the boss loading bar")
     @Entry(category = loading)
     public static BossBarType bossBarType = BossBarType.NOTCHED_6;
+    @Entry(category = loading, isSlider = true, min = 15, max = 100)
+    public static int bossBarSize = 85;
     @Entry(category = loading, isSlider = true, min = 1, max = 10)
     public static int spinningCircleSize = 2;
     @Entry(category = loading, isSlider = true, min = 1, max = 10)
@@ -63,7 +65,7 @@ public class CustomSplashScreenConfig extends MidnightConfig {
         Mojang, Aspect1to1, Hidden;
     }
     public enum ProgressBarMode {
-        Linear, Stretch;
+        Linear, Stretch, Slide;
     }
     public enum BossBarColor {
         MAGENTA, CYAN, RED, LIME, YELLOW, PURPLE, WHITE;

@@ -26,6 +26,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -34,7 +35,7 @@ import java.util.function.IntSupplier;
 import static net.minecraft.client.gui.DrawableHelper.drawTexture;
 import static net.minecraft.client.gui.DrawableHelper.fill;
 
-@Mixin(SplashOverlay.class)
+@Mixin(value = SplashOverlay.class, priority = 3000)
 public abstract class MixinSplashScreen {
 
     @Shadow @Final static Identifier LOGO;
@@ -49,6 +50,7 @@ public abstract class MixinSplashScreen {
         return 0;
     }
 
+    @Shadow @Final private static IntSupplier BRAND_ARGB;
     private static final Identifier EMPTY_TEXTURE = new Identifier("customsplashscreen","empty.png");
     private static final Identifier MOJANG_TEXTURE = new Identifier("customsplashscreen", "wide_logo.png");
     private static final Identifier ASPECT_1to1_TEXTURE = new Identifier("customsplashscreen", "square_logo.png");
@@ -128,28 +130,33 @@ public abstract class MixinSplashScreen {
             RenderSystem.setShader(GameRenderer::getPositionTexProgram);
 
             int overlay = 70 + CustomSplashScreenConfig.bossBarType.ordinal()*10;
+            int width = (int) ((x2 - x1) * (CustomSplashScreenConfig.bossBarSize * 0.01f));
+            int offset = ((x2 - x1) - width) / 2;
+            i = MathHelper.ceil((float)(width - 2) * this.progress);
 
-            drawTexture(matrices, x1, y1 + 1, x2 - x1, (int) ((y2-y1) / 1.4f), 0, color, 182, 5,256, 256);
-            drawTexture(matrices, x1, y1 + 1, i, (int) ((y2-y1) / 1.4f), 0, color+5, (int) (180 * this.progress), 5, 256, 256);
+            drawTexture(matrices, x1 + offset, y1 + 1, width, (int) ((width / 182f) * 5), 0, color, 182, 5,256, 256);
+            drawTexture(matrices, x1 + offset, y1 + 1, i, (int) ((width / 182f) * 5), 0, color+5, (int) (180 * this.progress), 5, 256, 256);
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             if (overlay != 120) {
-                drawTexture(matrices, x1, y1 + 1, x2 - x1, (int) ((y2-y1) / 1.4f), 0, overlay, 182, 5,256, 256);
+                drawTexture(matrices, x1 + offset, y1 + 1, width, (int) ((width / 182f) * 5), 0, overlay, 182, 5,256, 256);
             }
             RenderSystem.disableBlend();
         }
 
         // Custom Progress Bar
         if (CustomSplashScreenConfig.progressBarType == CustomSplashScreenConfig.ProgressBarType.Custom) {
-            int customWidth = CustomSplashScreenConfig.customProgressBarMode == CustomSplashScreenConfig.ProgressBarMode.Linear ? x2 - x1 : i;
+            int regionWidth = CustomSplashScreenConfig.customProgressBarMode == CustomSplashScreenConfig.ProgressBarMode.Stretch ? x2 - x1 : i;
+            int height = (int) (((x2 - x1) / 400f) * 10);
+            int u = CustomSplashScreenConfig.customProgressBarMode.equals(CustomSplashScreenConfig.ProgressBarMode.Slide) ? x2 - x1 - i : 0;
             if (CustomSplashScreenConfig.progressBarBackground) {
                 RenderSystem.setShaderTexture(0, CUSTOM_PROGRESS_BAR_BACKGROUND_TEXTURE);
                 RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-                drawTexture(matrices, x1, y1, 0, 0, 6, x2 - x1, y2 - y1, 10, x2-x1);
+                drawTexture(matrices, x1, y1, x2 - x1, height, 0, 0, x2 - x1, height, x2 - x1, height);
             }
             RenderSystem.setShaderTexture(0, CUSTOM_PROGRESS_BAR_TEXTURE);
             RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-            drawTexture(matrices, x1, y1, 0, 0, 6, i, y2 - y1, customWidth, 10);
+            drawTexture(matrices, x1, y1, i, height, u, 0, regionWidth, height, x2 - x1, height);
         }
         // Spinning Circle Progress Indicator
         if (CustomSplashScreenConfig.progressBarType == CustomSplashScreenConfig.ProgressBarType.SpinningCircle) {
@@ -160,7 +167,7 @@ public abstract class MixinSplashScreen {
             int m = MathHelper.ceil((1.0F - MathHelper.clamp(f - 1.0F, 0.0F, 1.0F)) * 255.0F);
             int time = (((int) (MidnightColorUtil.hue * 24 * CustomSplashScreenConfig.spinningCircleSpeed))%24)-1;
 
-            int color = withAlpha(MidnightColorUtil.hex2Rgb(CustomSplashScreenConfig.progressBarColor).getRGB(), m);
+            int color = withAlpha(MidnightColorUtil.hex2Rgb(CustomSplashScreenConfig.splashProgressBarColor).getRGB(), m);
             for (int j = 0; j<=CustomSplashScreenConfig.spinningCircleTrail; j++) {
                 RenderSystem.enableBlend();
                 RenderSystem.defaultBlendFunc();
@@ -205,11 +212,27 @@ public abstract class MixinSplashScreen {
             case 23 -> DrawableHelper.fill(matrices, left + 3*blockSize, top + blockSize, left + 2 * blockSize, top + 2*blockSize, color);
         }
     }
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Ljava/util/function/IntSupplier;getAsInt()I"))
-    private int css$modifyBackground(IntSupplier instance) { // Set the Background Color to our configured value //
-        return !CustomSplashScreenConfig.backgroundImage ? MidnightColorUtil.hex2Rgb(CustomSplashScreenConfig.backgroundColor).getRGB() | 255 << 24 : 0;
+//    Replaced by the methods below for compatibility with Puzzle
+//    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Ljava/util/function/IntSupplier;getAsInt()I"))
+//    private int css$modifyBackground(IntSupplier instance) { // Set the Background Color to our configured value //
+//        return !CustomSplashScreenConfig.backgroundImage ? MidnightColorUtil.hex2Rgb(CustomSplashScreenConfig.backgroundColor).getRGB() | 255 << 24 : 0;
+//    }
+    @Inject(method = "withAlpha", at = @At("RETURN"), cancellable = true)
+    private static void css$modifyBackgroundColor(int color, int alpha, CallbackInfoReturnable<Integer> cir) {
+        if (color == BRAND_ARGB.getAsInt()) {
+            int configColor = !CustomSplashScreenConfig.backgroundImage ? MidnightColorUtil.hex2Rgb(CustomSplashScreenConfig.splashBackgroundColor).getRGB() | 255 << 24 : 0;
+            cir.setReturnValue(configColor & 16777215 | alpha << 24);
+        }
     }
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;blendFunc(II)V", shift = At.Shift.AFTER), remap = false)
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/GlStateManager;_clearColor(FFFF)V"))
+    private void css$clearModifiedColor(float red, float green, float blue, float alpha) {
+        int k = !CustomSplashScreenConfig.backgroundImage ? MidnightColorUtil.hex2Rgb(CustomSplashScreenConfig.splashBackgroundColor).getRGB() : 0;
+        float m = (float)(k >> 16 & 255) / 255.0F;
+        float n = (float)(k >> 8 & 255) / 255.0F;
+        float o = (float)(k & 255) / 255.0F;
+        GlStateManager._clearColor(m, n, o, 1.0F);
+    }
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;blendFunc(II)V", shift = At.Shift.AFTER))
     private void css$betterBlend(MatrixStack matrices, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (!CustomSplashScreenConfig.logoBlend) RenderSystem.defaultBlendFunc();
     }
@@ -219,16 +242,16 @@ public abstract class MixinSplashScreen {
             float f = this.reloadCompleteTime > -1L ? (float) (Util.getMeasuringTimeMs() - this.reloadCompleteTime) / 1000.0F : -1.0F;
             int m = MathHelper.ceil((1.0F - MathHelper.clamp(f - 1.0F, 0.0F, 1.0F)) * 255.0F);
             RenderSystem.disableBlend();
-            fill(matrices, minX, minY, maxX, maxY, withAlpha(MidnightColorUtil.hex2Rgb(CustomSplashScreenConfig.progressBackgroundColor).getRGB(), m));
+            fill(matrices, minX, minY, maxX, maxY, withAlpha(MidnightColorUtil.hex2Rgb(CustomSplashScreenConfig.splashProgressBackgroundColor).getRGB(), m));
         }
     }
 
     @ModifyArg(method = "renderProgressBar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/SplashOverlay;fill(Lnet/minecraft/client/util/math/MatrixStack;IIIII)V"), index = 5)
     private int css$modifyProgressFrame(int color) { // Set the Progress Bar Frame Color to our configured value //
-        return CustomSplashScreenConfig.progressBarType.equals(CustomSplashScreenConfig.ProgressBarType.Vanilla) ? MidnightColorUtil.hex2Rgb(CustomSplashScreenConfig.progressFrameColor).getRGB() | 255 << 24 : 0;
+        return CustomSplashScreenConfig.progressBarType.equals(CustomSplashScreenConfig.ProgressBarType.Vanilla) ? MidnightColorUtil.hex2Rgb(CustomSplashScreenConfig.splashProgressFrameColor).getRGB() | 255 << 24 : 0;
     }
     @ModifyArg(method = "renderProgressBar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/SplashOverlay;fill(Lnet/minecraft/client/util/math/MatrixStack;IIIII)V", ordinal = 0), index = 5)
     private int css$modifyProgressColor(int color) { // Set the Progress Bar Color to our configured value //
-        return CustomSplashScreenConfig.progressBarType.equals(CustomSplashScreenConfig.ProgressBarType.Vanilla) ? MidnightColorUtil.hex2Rgb(CustomSplashScreenConfig.progressBarColor).getRGB() | 255 << 24 : 0;
+        return CustomSplashScreenConfig.progressBarType.equals(CustomSplashScreenConfig.ProgressBarType.Vanilla) ? MidnightColorUtil.hex2Rgb(CustomSplashScreenConfig.splashProgressBarColor).getRGB() | 255 << 24 : 0;
     }
 }

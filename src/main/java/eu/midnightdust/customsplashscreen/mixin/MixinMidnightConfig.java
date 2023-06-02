@@ -18,16 +18,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
-@Mixin(value = MidnightConfig.MidnightConfigScreen.class, remap = false)
+@Mixin(value = MidnightConfig.MidnightConfigScreen.class)
 public class MixinMidnightConfig extends Screen {
-    @Shadow @Final
+    @Shadow(remap = false) @Final
     public String modid;
 
     protected MixinMidnightConfig(Text title) {
         super(title);
     }
 
-    @Inject(at = @At("HEAD"),method = "init")
+    @Inject(at = @At("HEAD"), method = "init")
     protected void init(CallbackInfo ci) {
         if(this.modid.equals("customsplashscreen")) {
             this.addDrawableChild(ButtonWidget.builder(Text.literal("Preview"), (button) -> {
