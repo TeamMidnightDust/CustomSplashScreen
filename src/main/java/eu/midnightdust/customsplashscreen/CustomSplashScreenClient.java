@@ -2,6 +2,7 @@ package eu.midnightdust.customsplashscreen;
 
 import eu.midnightdust.customsplashscreen.config.CustomSplashScreenConfig;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.*;
@@ -14,6 +15,15 @@ public class CustomSplashScreenClient implements ClientModInitializer {
     public static final Path SquareLogoTexture = Paths.get(CONFIG_PATH + "/square_logo.png");
     public static final Path ProgressBarTexture = Paths.get(CONFIG_PATH + "/progressbar.png");
     public static final Path ProgressBarBackgroundTexture = Paths.get(CONFIG_PATH + "/progressbar_background.png");
+    private static float process = 0;
+
+    private static void tick() {
+        process = (process + 0.24f * CustomSplashScreenConfig.spinningCircleSpeed) % 24;
+    }
+
+    public static int getProcess(){
+        return (int) (process-1);
+    }
 
     @Override
     public void onInitializeClient() {
@@ -38,5 +48,9 @@ public class CustomSplashScreenClient implements ClientModInitializer {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        ClientTickEvents.END_CLIENT_TICK.register(
+                client -> tick()
+        );
     }
 }

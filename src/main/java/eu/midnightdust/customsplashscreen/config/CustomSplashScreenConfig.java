@@ -61,15 +61,19 @@ public class CustomSplashScreenConfig extends MidnightConfig {
     public enum ProgressBarType {
         Vanilla, BossBar, Custom, SpinningCircle, Hidden;
     }
+
     public enum LogoStyle {
         Mojang, Aspect1to1, Hidden;
     }
+
     public enum ProgressBarMode {
         Linear, Stretch, Slide;
     }
+
     public enum BossBarColor {
         MAGENTA, CYAN, RED, LIME, YELLOW, PURPLE, WHITE;
     }
+
     public enum BossBarType {
         PROGRESS, NOTCHED_6, NOTCHED_10, NOTCHED_12, NOTCHED_20;
     }
