@@ -20,7 +20,8 @@ import java.util.concurrent.CompletableFuture;
 
 @Mixin(value = MidnightConfig.MidnightConfigScreen.class)
 public class MixinMidnightConfig extends Screen {
-    @Shadow(remap = false) @Final
+    @Shadow(remap = false)
+    @Final
     public String modid;
 
     protected MixinMidnightConfig(Text title) {
@@ -29,12 +30,12 @@ public class MixinMidnightConfig extends Screen {
 
     @Inject(at = @At("HEAD"), method = "init")
     protected void init(CallbackInfo ci) {
-        if(this.modid.equals("customsplashscreen")) {
+        if (this.modid.equals("customsplashscreen")) {
             this.addDrawableChild(ButtonWidget.builder(Text.literal("Preview"), (button) -> {
                 MidnightConfig.write("customsplashscreen");
                 (Objects.requireNonNull(this.client)).setOverlay(
-                                new SplashOverlay(client, SimpleResourceReload.create(ResourceManager.Empty.INSTANCE, List.of()
-                                        ,Object::notify,Object::notify,new CompletableFuture<>()), throwable -> {}, true));
+                        new SplashOverlay(client, SimpleResourceReload.create(ResourceManager.Empty.INSTANCE, List.of()
+                                , Object::notify, Object::notify, new CompletableFuture<>()), throwable -> {}, true));
             }).dimensions(this.width / 2 + 157, this.height - 28, 50, 20).build());
         }
     }

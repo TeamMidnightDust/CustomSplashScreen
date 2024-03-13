@@ -21,8 +21,7 @@ public class EmptyTexture extends ResourceTexture {
             InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream("empty.png");
             TextureData texture = null;
 
-            if( input != null ) {
-
+            if (input != null) {
                 try {
                     texture = new TextureData(new TextureResourceMetadata(true, true), NativeImage.read(input));
                 } finally {
@@ -36,5 +35,4 @@ public class EmptyTexture extends ResourceTexture {
             return new TextureData(var18);
         }
     }
-
 }

@@ -27,7 +27,7 @@ public class ConfigTexture extends ResourceTexture {
 
     protected TextureData loadTextureData(ResourceManager resourceManager) {
         try {
-            InputStream input = new FileInputStream(CustomSplashScreenClient.CONFIG_PATH+"/"+this.location.getPath());
+            InputStream input = new FileInputStream(CustomSplashScreenClient.CONFIG_PATH + "/" + this.location.getPath());
             if (this.location.getPath().equals("background.png") && CustomSplashScreenClient.CONFIG_PATH.toPath().resolve("backgrounds").toFile().isDirectory()) {
                 if (CustomSplashScreenClient.CONFIG_PATH.toPath().resolve("backgrounds").toFile().listFiles() != null) {
                     File[] backgrounds = Arrays.stream(Objects.requireNonNull(CustomSplashScreenClient.CONFIG_PATH.toPath().resolve("backgrounds").toFile().listFiles())).filter(file -> file.toString().endsWith(".png") || file.toString().endsWith(".jpg") || file.toString().endsWith(".jpeg")).toList().toArray(new File[0]);
