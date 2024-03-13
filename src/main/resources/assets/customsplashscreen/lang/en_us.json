@@ -23,6 +23,7 @@
 	"customsplashscreen.midnightconfig.customProgressBarMode":"Custom Progress Bar Mode",
 	"customsplashscreen.midnightconfig.enum.ProgressBarMode.Linear":"Linear",
 	"customsplashscreen.midnightconfig.enum.ProgressBarMode.Stretch":"Stretch",
+	"customsplashscreen.midnightconfig.enum.ProgressBarMode.Slide": "Slide",
 	"customsplashscreen.midnightconfig.spinningCircleSize":"Spinning Circle Size",
 	"customsplashscreen.midnightconfig.spinningCircleSpeed":"Spinning Circle Speed",
 	"customsplashscreen.midnightconfig.spinningCircleTrail":"Spinning Circle Trail Length",
