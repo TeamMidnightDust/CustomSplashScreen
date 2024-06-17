@@ -35,7 +35,7 @@ public class MixinMidnightConfig extends Screen {
                 (Objects.requireNonNull(this.client)).setOverlay(
                                 new SplashOverlay(client, SimpleResourceReload.create(ResourceManager.Empty.INSTANCE, List.of()
                                         ,Object::notify,Object::notify,new CompletableFuture<>()), throwable -> {}, true));
-            }).dimensions(this.width / 2 + 157, this.height - 28, 50, 20).build());
+            }).dimensions(this.width / 2 + 157, this.height - 26, 50, 20).build());
         }
     }
 }

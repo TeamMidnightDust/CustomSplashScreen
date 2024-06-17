@@ -2,6 +2,7 @@ package eu.midnightdust.customsplashscreen.mixin;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import eu.midnightdust.customsplashscreen.CustomSplashScreenClient;
 import eu.midnightdust.customsplashscreen.config.CustomSplashScreenConfig;
 import eu.midnightdust.customsplashscreen.texture.BlurredConfigTexture;
 import eu.midnightdust.customsplashscreen.texture.ConfigTexture;
@@ -31,6 +32,8 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 
+import static eu.midnightdust.customsplashscreen.CustomSplashScreenClient.id;
+
 @Mixin(value = SplashOverlay.class, priority = 3000)
 public abstract class MixinSplashScreen {
 
@@ -47,13 +50,12 @@ public abstract class MixinSplashScreen {
     }
 
     @Shadow @Final private static IntSupplier BRAND_ARGB;
-    private static final Identifier EMPTY_TEXTURE = new Identifier("customsplashscreen","empty.png");
-    private static final Identifier MOJANG_TEXTURE = new Identifier("customsplashscreen", "wide_logo.png");
-    private static final Identifier ASPECT_1to1_TEXTURE = new Identifier("customsplashscreen", "square_logo.png");
-    private static final Identifier BOSS_BAR_TEXTURE = new Identifier("textures/gui/bars.png");
-    private static final Identifier CUSTOM_PROGRESS_BAR_TEXTURE = new Identifier("customsplashscreen", "progressbar.png");
-    private static final Identifier CUSTOM_PROGRESS_BAR_BACKGROUND_TEXTURE = new Identifier("customsplashscreen", "progressbar_background.png");
-    private static final Identifier BACKGROUND_TEXTURE = new Identifier("customsplashscreen", "background.png");
+    @Unique private static final Identifier EMPTY_TEXTURE = id("empty.png");
+    @Unique private static final Identifier MOJANG_TEXTURE = id("wide_logo.png");
+    @Unique private static final Identifier ASPECT_1to1_TEXTURE = id("square_logo.png");
+    @Unique private static final Identifier CUSTOM_PROGRESS_BAR_TEXTURE = id("progressbar.png");
+    @Unique private static final Identifier CUSTOM_PROGRESS_BAR_BACKGROUND_TEXTURE = id("progressbar_background.png");
+    @Unique private static final Identifier BACKGROUND_TEXTURE = id("background.png");
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void css$init(MinecraftClient client, ResourceReload monitor, Consumer<Optional<Throwable>> exceptionHandler, boolean reloading, CallbackInfo ci) { // Load our custom textures on screen init //
@@ -61,11 +63,15 @@ public abstract class MixinSplashScreen {
             client.getTextureManager().registerTexture(LOGO, new BlurredConfigTexture(MOJANG_TEXTURE));
         else client.getTextureManager().registerTexture(LOGO, new EmptyTexture(EMPTY_TEXTURE));
 
-        client.getTextureManager().registerTexture(ASPECT_1to1_TEXTURE, new ConfigTexture(ASPECT_1to1_TEXTURE));
-        client.getTextureManager().registerTexture(BACKGROUND_TEXTURE, new ConfigTexture(BACKGROUND_TEXTURE));
+        if (CustomSplashScreenConfig.logoStyle.equals(CustomSplashScreenConfig.LogoStyle.Aspect1to1)) {
+            client.getTextureManager().registerTexture(ASPECT_1to1_TEXTURE, new ConfigTexture(ASPECT_1to1_TEXTURE));
+        }
+        if (CustomSplashScreenConfig.backgroundImage) client.getTextureManager().registerTexture(BACKGROUND_TEXTURE, new ConfigTexture(BACKGROUND_TEXTURE));
 
-        client.getTextureManager().registerTexture(CUSTOM_PROGRESS_BAR_TEXTURE, new ConfigTexture(CUSTOM_PROGRESS_BAR_TEXTURE));
-        client.getTextureManager().registerTexture(CUSTOM_PROGRESS_BAR_BACKGROUND_TEXTURE, new ConfigTexture(CUSTOM_PROGRESS_BAR_BACKGROUND_TEXTURE));
+        if (CustomSplashScreenConfig.progressBarType.equals(CustomSplashScreenConfig.ProgressBarType.Custom)) {
+            client.getTextureManager().registerTexture(CUSTOM_PROGRESS_BAR_TEXTURE, new ConfigTexture(CUSTOM_PROGRESS_BAR_TEXTURE));
+            client.getTextureManager().registerTexture(CUSTOM_PROGRESS_BAR_BACKGROUND_TEXTURE, new ConfigTexture(CUSTOM_PROGRESS_BAR_BACKGROUND_TEXTURE));
+        }
     }
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;getScaledWindowWidth()I", shift = At.Shift.BEFORE, ordinal = 2))
     private void css$renderSplashBackground(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
@@ -117,26 +123,6 @@ public abstract class MixinSplashScreen {
     private void css$renderProgressBar(DrawContext context, int x1, int y1, int x2, int y2, float opacity, CallbackInfo ci) {
         int i = MathHelper.ceil((float)(x2 - x1 - 2) * this.progress);
 
-        // Bossbar Progress Bar
-        if (CustomSplashScreenConfig.progressBarType == CustomSplashScreenConfig.ProgressBarType.BossBar) {
-            int color = CustomSplashScreenConfig.bossBarColor.ordinal() * 10;
-            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-
-            int overlay = 70 + CustomSplashScreenConfig.bossBarType.ordinal()*10;
-            int width = (int) ((x2 - x1) * (CustomSplashScreenConfig.bossBarSize * 0.01f));
-            int offset = ((x2 - x1) - width) / 2;
-            i = MathHelper.ceil((float)(width - 2) * this.progress);
-
-            context.drawTexture(BOSS_BAR_TEXTURE, x1 + offset, y1 + 1, width, (int) ((width / 182f) * 5), 0, color, 182, 5,256, 256);
-            context.drawTexture(BOSS_BAR_TEXTURE, x1 + offset, y1 + 1, i, (int) ((width / 182f) * 5), 0, color+5, (int) (180 * this.progress), 5, 256, 256);
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
-            if (overlay != 120) {
-                context.drawTexture(BOSS_BAR_TEXTURE, x1 + offset, y1 + 1, width, (int) ((width / 182f) * 5), 0, overlay, 182, 5,256, 256);
-            }
-            RenderSystem.disableBlend();
-        }
-
         // Custom Progress Bar
         if (CustomSplashScreenConfig.progressBarType == CustomSplashScreenConfig.ProgressBarType.Custom) {
             int regionWidth = CustomSplashScreenConfig.customProgressBarMode == CustomSplashScreenConfig.ProgressBarMode.Stretch ? x2 - x1 : i;
@@ -156,7 +142,7 @@ public abstract class MixinSplashScreen {
             int size = (y2-y1)*CustomSplashScreenConfig.spinningCircleSize;
             float f = this.reloadCompleteTime > -1L ? (float) (Util.getMeasuringTimeMs() - this.reloadCompleteTime) / 1000.0F : -1.0F;
             int m = MathHelper.ceil((1.0F - MathHelper.clamp(f - 1.0F, 0.0F, 1.0F)) * 255.0F);
-            int time = (((int) (MidnightColorUtil.hue * 24 * CustomSplashScreenConfig.spinningCircleSpeed))%24)-1;
+            int time = (((int) (CustomSplashScreenClient.spinningProgress * 24 * CustomSplashScreenConfig.spinningCircleSpeed))%24)-1;
 
             int color = withAlpha(MidnightColorUtil.hex2Rgb(CustomSplashScreenConfig.splashProgressBarColor).getRGB(), m);
             for (int j = 0; j<=CustomSplashScreenConfig.spinningCircleTrail; j++) {

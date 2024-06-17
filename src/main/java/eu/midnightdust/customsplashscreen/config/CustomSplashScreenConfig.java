@@ -43,14 +43,6 @@ public class CustomSplashScreenConfig extends MidnightConfig {
     @Entry(category = loading)
     public static ProgressBarMode customProgressBarMode = ProgressBarMode.Linear;
 
-    //"Change the color of the boss loading bar")
-    @Entry(category = loading)
-    public static BossBarColor bossBarColor = BossBarColor.MAGENTA;
-    //"Change the style of the boss loading bar")
-    @Entry(category = loading)
-    public static BossBarType bossBarType = BossBarType.NOTCHED_6;
-    @Entry(category = loading, isSlider = true, min = 15, max = 100)
-    public static int bossBarSize = 85;
     @Entry(category = loading, isSlider = true, min = 1, max = 10)
     public static int spinningCircleSize = 2;
     @Entry(category = loading, isSlider = true, min = 1, max = 10)
@@ -59,18 +51,12 @@ public class CustomSplashScreenConfig extends MidnightConfig {
     public static int spinningCircleTrail = 5;
 
     public enum ProgressBarType {
-        Vanilla, BossBar, Custom, SpinningCircle, Hidden;
+        Vanilla, Custom, SpinningCircle, Hidden;
     }
     public enum LogoStyle {
         Mojang, Aspect1to1, Hidden;
     }
     public enum ProgressBarMode {
         Linear, Stretch, Slide;
-    }
-    public enum BossBarColor {
-        MAGENTA, CYAN, RED, LIME, YELLOW, PURPLE, WHITE;
-    }
-    public enum BossBarType {
-        PROGRESS, NOTCHED_6, NOTCHED_10, NOTCHED_12, NOTCHED_20;
     }
 }
