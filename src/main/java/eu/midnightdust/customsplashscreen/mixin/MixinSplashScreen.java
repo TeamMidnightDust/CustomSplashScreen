@@ -10,12 +10,16 @@ import eu.midnightdust.customsplashscreen.texture.EmptyTexture;
 import eu.midnightdust.lib.config.MidnightConfig;
 import eu.midnightdust.lib.util.MidnightColorUtil;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.SplashOverlay;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderPhase;
 import net.minecraft.resource.ResourceReload;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -37,7 +41,7 @@ import static eu.midnightdust.customsplashscreen.CustomSplashScreenClient.id;
 @Mixin(value = SplashOverlay.class, priority = 3000)
 public abstract class MixinSplashScreen {
 
-    @Shadow @Final static Identifier LOGO;
+    @Shadow @Final public static Identifier LOGO;
     @Shadow @Final private MinecraftClient client;
     @Shadow @Final private boolean reloading;
     @Shadow private float progress;
@@ -73,9 +77,10 @@ public abstract class MixinSplashScreen {
             client.getTextureManager().registerTexture(CUSTOM_PROGRESS_BAR_BACKGROUND_TEXTURE, new ConfigTexture(CUSTOM_PROGRESS_BAR_BACKGROUND_TEXTURE));
         }
     }
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;getScaledWindowWidth()I", shift = At.Shift.BEFORE, ordinal = 2))
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;getScaledWindowWidth()I", ordinal = 2))
     private void css$renderSplashBackground(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (CustomSplashScreenConfig.backgroundImage) {
+            context.getMatrices().translate(0, 0, 1f);
             int width = client.getWindow().getScaledWidth();
             int height = client.getWindow().getScaledHeight();
             float f = this.reloadCompleteTime > -1L ? (float)(Util.getMeasuringTimeMs() - this.reloadCompleteTime) / 1000.0F : -1.0F;
@@ -87,9 +92,7 @@ public abstract class MixinSplashScreen {
             RenderSystem.enableBlend();
             RenderSystem.blendEquation(32774);
             RenderSystem.defaultBlendFunc();
-            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, s);
-            context.drawTexture(BACKGROUND_TEXTURE, 0, 0, 0, 0, 0, width, height, width, height);
+            context.drawTexture(RenderLayer::getGuiTextured, BACKGROUND_TEXTURE, 0, 0, 0, 0, width, height, width, height, ColorHelper.fromFloats(s, 1.f, 1.f, 1.f));
             RenderSystem.defaultBlendFunc();
             RenderSystem.disableBlend();
         }
@@ -108,11 +111,9 @@ public abstract class MixinSplashScreen {
             int w = (int)(d * 2);
             // Render the Logo
             RenderSystem.enableBlend();
-            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
             RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
             if (!CustomSplashScreenConfig.logoBlend) RenderSystem.defaultBlendFunc();
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, s);
-            context.drawTexture(ASPECT_1to1_TEXTURE,(int)(this.client.getWindow().getScaledWidth() * 0.5D) - (w / 2), (int)(d * 0.5D), w, w, 0, 0, 512, 512, 512, 512);
+            context.drawTexture(RenderLayer::getGuiTextured, ASPECT_1to1_TEXTURE,(int)(this.client.getWindow().getScaledWidth() * 0.5D) - (w / 2), (int)(d * 0.5D), 0, 0, w, w, 512, 512, 512, 512, ColorHelper.fromFloats(s, 1.f, 1.f, 1.f));
             RenderSystem.defaultBlendFunc();
             RenderSystem.disableBlend();
         }
@@ -129,11 +130,9 @@ public abstract class MixinSplashScreen {
             int height = (int) (((x2 - x1) / 400f) * 10);
             int u = CustomSplashScreenConfig.customProgressBarMode.equals(CustomSplashScreenConfig.ProgressBarMode.Slide) ? x2 - x1 - i : 0;
             if (CustomSplashScreenConfig.progressBarBackground) {
-                RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-                context.drawTexture(CUSTOM_PROGRESS_BAR_BACKGROUND_TEXTURE, x1, y1, x2 - x1, height, 0, 0, x2 - x1, height, x2 - x1, height);
+                context.drawTexture(RenderLayer::getGuiTextured, CUSTOM_PROGRESS_BAR_BACKGROUND_TEXTURE, x1, y1, 0, 0, x2 - x1, height, x2 - x1, height, x2 - x1, height, ColorHelper.fromFloats(1.f, 1.f, 1.f, 1.f));
             }
-            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-            context.drawTexture(CUSTOM_PROGRESS_BAR_TEXTURE, x1, y1, i, height, u, 0, regionWidth, height, x2 - x1, height);
+            context.drawTexture(RenderLayer::getGuiTextured, CUSTOM_PROGRESS_BAR_TEXTURE, x1, y1, u, 0, i, height, regionWidth, height, x2 - x1, height, ColorHelper.fromFloats(1.f, 1.f, 1.f, 1.f));
         }
         // Spinning Circle Progress Indicator
         if (CustomSplashScreenConfig.progressBarType == CustomSplashScreenConfig.ProgressBarType.SpinningCircle) {
@@ -209,7 +208,7 @@ public abstract class MixinSplashScreen {
         float o = (float)(k & 255) / 255.0F;
         GlStateManager._clearColor(m, n, o, 1.0F);
     }
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;blendFunc(II)V", shift = At.Shift.AFTER))
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/ColorHelper;getWhite(F)I", shift = At.Shift.AFTER))
     private void css$betterBlend(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (!CustomSplashScreenConfig.logoBlend) RenderSystem.defaultBlendFunc();
     }
